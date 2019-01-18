@@ -31,10 +31,6 @@ namespace DatingApp
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<DataContext>(x => x.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
-            services.AddScoped<IAuthRepository, AuthRepository>();
-            services.AddCors();
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddJwtBearer(options =>
                 {
@@ -47,6 +43,11 @@ namespace DatingApp
                         ValidateAudience = false,
                     };
                 });
+
+            services.AddDbContext<DataContext>(x => x.UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddScoped<IAuthRepository, AuthRepository>();
+            services.AddCors();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -62,8 +63,8 @@ namespace DatingApp
             }
 
             // app.UseHttpsRedirection();
-            app.UseCors(x => x.AllowAnyOrigin().AllowAnyMethod().AllowAnyMethod());
             app.UseAuthentication();
+            app.UseCors(builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
             app.UseMvc();
         }
     }
